@@ -5,7 +5,7 @@
 **微信公众号：猿湿Xoong**
 
 #### 详细介绍
-WxConn是一个基于python、python GUI Tkinter、微信网页版和itchat的PC端工具。
+WxConn是一个基于python 2.7、python GUI Tkinter、微信网页版和itchat的PC端工具（玩具）。
 
 主要功能是：
 * 提供PC端简洁操作界面。
