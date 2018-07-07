@@ -109,24 +109,27 @@ class UI(object):
         self.main.pack(fill=tk.BOTH, expand=1)
 
         self.analyst = threading.Thread(target=ALS.analysis, args=(self.queue,))
+        self.analyst.setDaemon(True)
         self.generator = threading.Thread(target=ALS.generate_result, args=(self.queue,))
+        self.generator.setDaemon(True)
 
         self.master.protocol("WM_DELETE_WINDOW", self.onClose)
 
     def onClose(self):
         self.running = False
+        self.intro.destroy()
+        self.qrscan.destroy()
+        self.main.destroy()
+        import sys
+        sys.exit(0)
 
     def periodicCall(self):
         """
         Check every 200 ms if there is something new in the queue.
         """
         self.processIncoming()
-        if not self.running:
-            # This is the brutal stop of the system. You may want to do
-            # some cleanup before actually shutting it down.
-            import sys
-            sys.exit(1)
-        self.master.after(200, self.periodicCall)
+        if self.running:
+            self.master.after(200, self.periodicCall)
 
     def processIncoming(self):
         """Handle all messages currently in the queue, if any."""
