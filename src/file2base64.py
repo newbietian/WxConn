@@ -1,8 +1,6 @@
 # coding=utf8
 import base64
-import sys
 images = [
-    #{"name": "background", "path": "background.png"},
     {"name": "zhifubao_hongbao", "path": r"zhifubao.png"},
 ]
 

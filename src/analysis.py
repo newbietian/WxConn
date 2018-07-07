@@ -9,8 +9,7 @@ import sys
 import images
 
 import itchat
-from tqdm import tqdm
-from pypinyin import pinyin, lazy_pinyin, Style
+from pypinyin import lazy_pinyin
 
 # [linux] sudo apt-get install python-pandas
 import pandas as pd
