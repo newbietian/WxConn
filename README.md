@@ -24,11 +24,11 @@ pandas</br>
 PIL</br>
 matplotlib</br>
 
-#### exe文件
+#### Exe文件
 下载Exe文件，无需安装依赖库，即可直接运行
 
 ##### Release Note
-[WxConn v1.0](https://github.com/Bravest-Ptt/WxConn/blob/master/qrcode/%E7%8C%BF%E6%B9%BFXoong-258-end.jpg?raw=true)
+[WxConn v1.0](https://github.com/Bravest-Ptt/WxConn/raw/master/release/WxConn-v1.0.exe)
 
 #### 个人微信
 ![](https://github.com/Bravest-Ptt/WxConn/blob/master/qrcode/%E4%B8%AA%E4%BA%BA%E5%BE%AE%E4%BF%A1-258.png?raw=true)
