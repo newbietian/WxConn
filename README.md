@@ -1,2 +1,29 @@
-# WxConn
+## WxConn
 统计你的微信连接多少人，包括好友、群聊人数，并提供去重后的结果
+
+**作者：湿兄ptt**</br>
+**微信公众号：猿湿Xoong**
+
+#### 详细介绍
+WxConn是一个基于python、python GUI Tkinter、微信网页版和itchat的PC端工具。
+
+主要功能是：
+* 提供PC端简洁操作界面。
+* 进行个人微信中好友人数、群聊中人数的统计。
+* 生成关于所有可能连接人的「性别分析」、「前六省份分析」、「前五城市分析」。
+* 根据数据生成长图，并发送至手机端微信的**「文件传输助手」**。
+* 提供打包生成的exe文件
+
+#### 结果展示
+![](https://github.com/Bravest-Ptt/WxConn/blob/master/result/result_little.jpg?raw=true)
+
+#### 运行依赖库
+[itchat](https://github.com/littlecodersh/ItChat)</br>
+pypinyin</br>
+pandas</br>
+PIL</br>
+matplotlib</br>
+
+#### exe文件
+下载Exe文件，无需安装依赖库，即可直接运行
+
