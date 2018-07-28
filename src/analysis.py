@@ -144,7 +144,8 @@ def combine_images(imgs_path, result_w=800, inner_img_w=700, inner_img_spacing=5
         imgs_h.append(h)
         # print "path = %s, height = %d" % (path, h)
 
-    result_height += sum(imgs_h) + (len(imgs_h) - 1) * image_spacing + image_margin_top + image_margin_bottom
+    qr_code_margin_ext = 100
+    result_height += sum(imgs_h) + (len(imgs_h) - 1) * image_spacing + image_margin_top + image_margin_bottom + qr_code_margin_ext
     # print result_height
 
     bk = Image.new('RGB', (result_width, result_height), bk_color)
@@ -156,6 +157,9 @@ def combine_images(imgs_path, result_w=800, inner_img_w=700, inner_img_spacing=5
         # else equals to sum of previous images and sum of spacing
         y_paste = (image_margin_top if index == 0
                    else (image_margin_top + sum(imgs_h[0:index - 1]) + imgs_h[index - 1] + image_spacing * index))
+        # paste qrcode
+        if index == len(imgs_path) - 1:
+            y_paste = y_paste + qr_code_margin_ext
         # print y_paste
         bk.paste(im, (x_paste, y_paste))
         im.close()

@@ -1,7 +1,10 @@
 # coding=utf8
 import base64
+# 不支持大文件
+# 将小文件按照下面格式输入
 images = [
-    {"name": "zhifubao_hongbao", "path": r"zhifubao.png"},
+    {"name": "bottom_share", "path": r"bottom_share.png"},
+    {"name": "pure_code_w_214", "path": r"pure_code_w_214.png"},
 ]
 
 if __name__ == "__main__":

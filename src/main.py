@@ -1,7 +1,10 @@
 # coding=utf8
 import tkinter as tk
 from tkinter import ttk
+import tkinter.font as tkFont
+import tkinter.messagebox as tkMessageBox
 from PIL import Image, ImageTk
+from emoji import *
 import analysis as ALS
 import base64
 import os
@@ -9,22 +12,31 @@ import shutil
 import images
 import Queue
 import threading
+import random
+import sys
+import webbrowser
+import datetime
 
 # [linux] sudo apt-get install python-numpy python-matplotlib
 import matplotlib
 import matplotlib.pyplot as plt
 
 # 路径常量定义
-VERSION = "v1.0"
+VERSION = "v1.1"
 DATA = "./WxConnData"
 RESOURCE = DATA + "/resource"
 RES_APP_TITLE = RESOURCE + "/app_title.png"
 RES_APP_ICON = RESOURCE + "/app_icon.ico"
+RES_MAIN_SHARE_TIP = "/main_share_tip.png"
 
 PUBLIC_QR = DATA + "/qrcodes"
-PUBLIC_QR_1 = PUBLIC_QR + "/ads_1.png"
-PUBLIC_QR_2 = PUBLIC_QR + "/ads_2.png"
 PUBLIC_QR_HONGBAO = PUBLIC_QR + "/alipay_hongbao.png"
+PUBLIC_QR_PTT_CODE_WITH_TITLE = "/ptt_code_with_title.png"
+PUBLIC_QR_PTT_PURE_CODE = "/ptt_pure_code_.png"
+# 轮播滚动栏的图
+# PUBLIC_QR_1 = PUBLIC_QR + "/ads_1.png"
+# PUBLIC_QR_2 = PUBLIC_QR + "/ads_2.png"
+
 
 ASSETS_TTF = RESOURCE + "/STXINGKA.TTF"
 
@@ -51,31 +63,41 @@ def _init_resource():
     os.mkdir(RESOURCE)
     os.mkdir(PUBLIC_QR)
 
+    # res
     with open(RES_APP_TITLE, 'wb') as f1:
-        app_title = base64.b64decode(images.res_app_title)
-        f1.write(app_title)
+        f1.write(base64.b64decode(images.res_app_title))
         f1.close()
 
     with open(RES_APP_ICON, 'wb') as f2:
-        app_icon = base64.b64decode(images.res_app_icon)
-        f2.write(app_icon)
+        f2.write(base64.b64decode(images.res_app_icon))
         f2.close()
 
-    # ads
-    with open(PUBLIC_QR_1, 'wb') as ads1:
-        pic_ads1 = base64.b64decode(images.ads_1)
-        ads1.write(pic_ads1)
-        ads1.close()
+    with open(RES_MAIN_SHARE_TIP, 'wb') as f3:
+        f3.write(base64.b64decode(images.main_share_tip))
+        f3.close()
 
-    with open(PUBLIC_QR_2, 'wb') as ads2:
-        pic_ads2 = base64.b64decode(images.ads_2)
-        ads2.write(pic_ads2)
-        ads2.close()
+    # # ads
+    # with open(PUBLIC_QR_1, 'wb') as ads1:
+    #     pic_ads1 = base64.b64decode(images.ads_1)
+    #     ads1.write(pic_ads1)
+    #     ads1.close()
+    #
+    # with open(PUBLIC_QR_2, 'wb') as ads2:
+    #     pic_ads2 = base64.b64decode(images.ads_2)
+    #     ads2.write(pic_ads2)
+    #     ads2.close()
 
     with open(PUBLIC_QR_HONGBAO, 'wb') as hongbao:
-        pic_hongbao = base64.b64decode(images.zhifubao_hongbao)
-        hongbao.write(pic_hongbao)
+        hongbao.write(base64.b64decode(images.zhifubao_hongbao))
         hongbao.close()
+
+    with open(PUBLIC_QR_PTT_CODE_WITH_TITLE, 'wb') as ptt_title:
+        ptt_title.write(base64.b64decode(images.ptt_code_with_title))
+        ptt_title.close()
+
+    with open(PUBLIC_QR_PTT_PURE_CODE, 'wb') as ptt:
+        ptt.write(base64.b64decode(images.ptt_pure_code))
+        ptt.close()
 
 
 def _init_ttf():
@@ -169,8 +191,9 @@ class UI(object):
         self.intro.draw()
 
     def gotoQrcode(self):
+        self.intro.anim_button_running = False
         self.intro.destroy()
-        # 运行线程
+        # 运行分析线程
         self.analyst.start()
         # 显示qrscan
         self.qrscan.draw()
@@ -294,83 +317,101 @@ class Introduction(tk.Frame):
         tk.Frame.__init__(self, master=master, *args, **kwargs)
         self.bgcolor = 'white'
         self.on_click = None
+        self.anim_button_running = True
 
     def draw(self):
-        self.title_canvas = tk.Canvas(self, bg=self.bgcolor, width=250, height=80, bd=0, highlightthickness=0, relief='ridge')
-        self.title_pic = self._resize_ads_qrcode(RES_APP_TITLE, size=(250, 80))
+
+        self.base_frm = tk.Frame(self, width=width, height=height, bg='white')
+        self.base_frm.pack(fill=tk.BOTH, expand=1)
+
+        self.title_canvas = tk.Canvas(self.base_frm, bg=self.bgcolor, width=width, height=90, bd=0, highlightthickness=0, relief='ridge')
+        self.title_pic = self._resize_ads_qrcode(RES_APP_TITLE, size=(260, 90))
         self.title_canvas.create_image(0, 0, anchor='nw', image=self.title_pic)
-        self.title_canvas.pack(padx=35, pady=10)
+        self.title_canvas.place(x=35, y=15)
 
-        # 作者
-        self.lable = tk.Label(self,
-                     text='作者：湿兄ptt\n微信公众号：猿湿Xoong',  # 标签的文字
-                     bg=self.bgcolor,  # 背景颜色
-                     font=('Times',10),  # 字体和字体大小
-                     width=15, height=2  # 标签长宽
-                     )
-        self.lable.pack(fill=tk.BOTH)  # 固定窗口位置
-
-        # 提示
-        self.lable_3 = tk.Label(self,
-                     text='基于微信网页版\nbased on github itchat',  # 标签的文字
-                     bg=self.bgcolor,  # 背景颜色
-                     fg='blue',
-                     font=('Times',8),  # 字体和字体大小
-                     width=15, height=2  # 标签长宽
-                     )
-        self.lable_3.pack(pady=2, fill=tk.BOTH)  # 固定窗口位置
-
-        # 群提示
-        self.about_qun = tk.Label(self,
-                     text='★网页版获取群聊★\n★需先将其保存到手机微信通讯录★',  # 标签的文字
-                     bg=self.bgcolor,  # 背景颜色
-                     font=('Times',12),  # 字体和字体大小
-                     width=15, height=2 # 标签长宽
-                     )
-        self.about_qun.pack(pady=5, fill=tk.BOTH)  # 固定窗口位置
-
-        # 第一点提示
-        self.lable_1 = tk.Label(self,
-                     text='1.本程序不收集或上传任何信息\n所有网络活动均是与微信服务器进行',  # 标签的文字
-                     bg=self.bgcolor,  # 背景颜色
-                     font=('Times',12),  # 字体和字体大小
-                     width=15, height=2  # 标签长宽
-                     )
-        self.lable_1.pack(pady=2, fill=tk.X)  # 固定窗口位置
-
-        # 第二点提示
-        self.lable_2 = tk.Label(self,
-                     text='2.为防止程序被恶意篡改请确保\n程序是从湿兄或他的小伙伴那获取的',  # 标签的文字
-                     bg=self.bgcolor,  # 背景颜色
-                     font=('Times',12),  # 字体和字体大小
-                     width=15, height=2  # 标签长宽
-                     )
-        self.lable_2.pack(pady=2,fill=tk.BOTH)  # 固定窗口位置
-
-        # 第三点提示
-        self.lable_3 = tk.Label(self,
-                     text='3.将exe文件的MD5与公众号后台\nMD5对比，即可判断是否被恶意篡改',  # 标签的文字
-                     bg=self.bgcolor,  # 背景颜色
-                     font=('Times',12),  # 字体和字体大小
-                     width=15, height=2  # 标签长宽
-                     )
-        self.lable_3.pack(pady=2,fill=tk.BOTH)  # 固定窗口位置
-
-        # 法律声明
-        self.law = tk.Label(self,
-                     text='本软件开源免费，请在遵守中国\n相关法律法规与微信使用规范的前提下使用\n请勿用于非法用途，如产生法律纠纷与开发者无关。',  # 标签的文字
-                     bg=self.bgcolor,  # 背景颜色
-                     fg='red',
-                     font=('Times',9),  # 字体和字体大小
-                     width=15, height=4  # 标签长宽
-                     )
-        self.law.pack(pady=2,fill=tk.BOTH)  # 固定窗口位置
+        self.my_code = tk.Canvas(self.base_frm, bg=self.bgcolor, width=width, height=250, bd=0, highlightthickness=0, relief='ridge')
+        self.code_pic = self._resize_ads_qrcode(PUBLIC_QR_PTT_CODE_WITH_TITLE, size=(200, 233))
+        self.my_code.create_image(0, 0, anchor='nw', image=self.code_pic)
+        self.my_code.place(x=60, y=110)
 
         # Button
-        btn_enter = tk.Button(self, text='我知道了',bg='#25BF2F',fg='white',font=('Times',11),
-                              width=13, height=2,
-                              bd=0, highlightthickness=0, relief='ridge',command=self.on_click)  # 定义一个`button`按钮，名为`Login`,触发命令为`usr_login`
-        btn_enter.pack(pady=10)
+        button_text = HAPPY_EMOJI[random.randint(0, len(HAPPY_EMOJI) - 1)]
+        self.btn_enter = tk.Button(self.base_frm, text=button_text, bg='white', fg='#25BF2F', font=('Arial', 14),
+                              width=12, height=1,
+                              bd=0.5, highlightthickness=0, relief='ridge', command=self._info_license)  # 定义一个`button`按钮，名为`Login`,触发命令为`usr_login`
+        self.btn_enter.place(x=90, y=430)
+
+        # star on github
+        ft = tkFont.Font(family='Arial', size=10, weight=tkFont.NORMAL, underline=1)
+        self.github_site = tk.Label(self.base_frm,
+                    text='Star on Github',  # 标签的文字
+                    bg=self.bgcolor,  # 背景颜色
+                    fg='blue',
+                    font=ft,  # 字体和字体大小
+                    width=30, height=1  # 标签长宽
+            )
+        self.github_site.place(x=36, y=340)  # 固定窗口位置
+        self.github_site.bind('<ButtonPress-1>', self._open_github_repo)
+
+        # 网页版提示
+        ft_wx = tkFont.Font(family='楷体', size=11, weight=tkFont.NORMAL)
+        self.thanks_wx = tk.Label(self.base_frm,
+                    text='基于微信网页版',  # 标签的文字
+                    bg=self.bgcolor,  # 背景颜色
+                    fg='black',
+                    font=ft_wx,  # 字体和字体大小
+                    width=30, height=1  # 标签长宽
+            )
+        self.thanks_wx.place(x=36, y=360)  # 固定窗口位置
+
+        # itchat声明
+        ft_itchat = tkFont.Font(family='Arial', size=10, weight=tkFont.NORMAL)
+        self.thanks_itchat = tk.Label(self.base_frm,
+                    text='Based on github itchat',  # 标签的文字
+                    bg=self.bgcolor,  # 背景颜色
+                    fg='black',
+                    font=ft_itchat,  # 字体和字体大小
+                    width=30, height=1  # 标签长宽
+            )
+        self.thanks_itchat.place(x=36, y=380)  # 固定窗口位置
+
+        self.timer = threading.Timer(1, self._anim_button_emoji)
+        self.timer.start()
+        self._info_save_group()
+
+    def _info_save_group(self):
+        tkMessageBox.showinfo("提示", "WxConn提供统计群聊人员的功能\n"
+                                    + "但由于网页版微信的不完全同步\n"
+                                    + "需先将群聊(们)保存到微信通讯录")
+
+    def _info_license(self):
+        result = tkMessageBox.askyesno("声明", "1、本程序不收集或上传任何信息，所有\n网络活动均是与微信服务器进行\n\n"
+                                        + "2、为防止程序被恶意篡改，请确保程序\n是从“猿湿Xoong”渠道获取\n\n"
+                                        + "3、将程序的MD5与公众号后台或github\n中MD5对比，即可判断是否被恶意篡改\n\n"
+                                        + "4、本软件开源免费，请在遵守中国相关\n法律法规与微信使用规范的前提下使用，\n请勿用于非法用途，如产生法律纠纷与开\n发者无关\n"
+                                        + "\n点击「是(Y)」继续，代表你同意此声明",
+                                 )
+        print result
+        if result == True:
+            self.on_click()
+
+    def _anim_button_emoji(self):
+        """
+        动态改变button中emoji
+        """
+        if self.anim_button_running:
+            button_text = HAPPY_EMOJI[random.randint(0, len(HAPPY_EMOJI) - 1)]
+            self.btn_enter.config(text=button_text)
+            self.btn_enter.update()
+            self.timer = threading.Timer(2, self._anim_button_emoji)
+            self.timer.start()
+
+    def _open_github_repo(self, event):
+        print '_open_github_repo'
+        sys.path.append("libs")
+        webbrowser.open('https://github.com/Bravest-Ptt/WxConn')
+        print webbrowser.get()
+
 
     def _resize_ads_qrcode(self, path, size=(100,100)):
         image_qr = Image.open(path)
@@ -385,8 +426,8 @@ class QrScan(tk.Frame):
         self.bgcolor = 'white'
 
     def draw(self):
-        self.title_canvas = tk.Canvas(self, bg=self.bgcolor, width=250, height=80, bd=0, highlightthickness=0, relief='ridge')
-        self.title_pic = self._resize_ads_qrcode(RES_APP_TITLE, size=(250, 80))
+        self.title_canvas = tk.Canvas(self, bg=self.bgcolor, width=width, height=90, bd=0, highlightthickness=0, relief='ridge')
+        self.title_pic = self._resize_ads_qrcode(RES_APP_TITLE, size=(260, 90))
         self.title_canvas.create_image(0, 0, anchor='nw', image=self.title_pic)
         self.title_canvas.pack(padx=35, pady=15)
 
@@ -400,13 +441,13 @@ class QrScan(tk.Frame):
         self.lable_tip = tk.Label(self,
                      text='请稍等',  # 标签的文字
                      bg=self.bgcolor,  # 背景颜色
-                     font=('Times',12),  # 字体和字体大小
+                     font=('楷体',12),  # 字体和字体大小
                      width=15, height=2  # 标签长宽
                      )
         self.lable_tip.pack(pady=2,fill=tk.BOTH)  # 固定窗口位置
 
     def update_qrcode(self):
-        self.lable_tip.config(text='请用微信扫一扫登录')
+        self.lable_tip.config(text='微信扫一扫开始统计')
         self.lable_tip.update()
 
         self.qrcode_pic = self._resize_ads_qrcode(ALS.user_qrcode_path, size=(200, 200))
@@ -471,11 +512,14 @@ class Main(tk.Frame):
                      )
         self.lable_progress.pack(fill=tk.X)  # 固定窗口位置
 
+
         # Button
-        btn_enter = tk.Button(self, text='支\n付\n宝\n红\n包',bg='#db2d32',fg='white',font=('Times',11),
-                              width=2, height=5,
-                              highlightthickness=0,relief='ridge',bd=0, command=self.show_alipay_hongbao)  # 定义一个`button`按钮，名为`Login`,触发命令为`usr_login`
-        btn_enter.place(x=300, y=20, anchor=tk.NW)
+        # 支付宝红包活动于2018年7月31截止
+        if datetime.datetime.now().year == 2018 and datetime.datetime.now().month < 8:
+            btn_enter = tk.Button(self, text='支\n付\n宝\n大\n红\n包',bg='#db2d32',fg='white',font=('Times',11),
+                                  width=2, height=6,
+                                  highlightthickness=0,relief='ridge',bd=0, command=self.show_alipay_hongbao)  # 定义一个`button`按钮，名为`Login`,触发命令为`usr_login`
+            btn_enter.place(x=300, y=20, anchor=tk.NW)
 
         # 进度条
         self.progress = ttk.Progressbar(self, orient='horizontal', length=200, mode='determinate')
@@ -483,54 +527,43 @@ class Main(tk.Frame):
         self.progress['value'] = 0
         self.progress.pack()
 
-        # 底部广告栏
+        # 广告栏布局 - 占据ui下半部分
         self.frm_ads = tk.Frame(self, width=width, height=height, bg='white')
         self.frm_ads.pack(fill=tk.BOTH, expand=1)
 
-        self.ads = tk.Frame(self.frm_ads, width=width, height=height, bg='white')
-        self.ads.pack(side='bottom',fill=tk.BOTH, expand=1)
+        # 我的二维码
+        self.my_code = tk.Canvas(self.frm_ads, bg=self.bgcolor, width=width, height=300, bd=0, highlightthickness=0, relief='ridge')
+        self.code_pic = self._resize_ads_qrcode(PUBLIC_QR_PTT_PURE_CODE, size=(214, 214))
+        self.my_code.create_image(0, 0, anchor='nw', image=self.code_pic)
+        self.my_code.place(x=53, y=20)
 
+        # 底部分享话语
+        self.share = tk.Canvas(self.frm_ads, bg=self.bgcolor, width=width, height=50, bd=0, highlightthickness=0, relief='ridge')
+        self.share_pic = self._resize_ads_qrcode(RES_MAIN_SHARE_TIP, size=(214, int(float(214) / 320 * 50)))
+        self.share.create_image(0, 0, anchor='nw', image=self.share_pic)
+        self.share.place(x=53, y=250)
+
+        # 底部轮播栏 - 布局
+        # self.ads = tk.Frame(self.frm_ads, width=width, height=height, bg='white')
+        # self.ads.pack(side='bottom',fill=tk.BOTH, expand=1)
+
+        # 底部轮播栏 - 图片container
         # you need to keep a reference to the photo object, otherwise, it will be out of the scope and be garbage collected.
-        self.canvas = tk.Canvas(self.ads, bg='white', height=216, width=width)
+        # self.canvas = tk.Canvas(self.ads, bg='white', height=216, width=width)
+        # self.canvas.pack(side='bottom')
 
-        # 添加二维码
-        # if self.set_ads_qr_path and len(self.set_ads_qr_path) == 6:
-        #     self.qr_1 = self._resize_ads_qrcode(self.set_ads_qr_path[0])
-        #     image = self.canvas.create_image(7, 0, anchor='nw', image=self.qr_1)
-        #
-        #     self.qr_2 = self._resize_ads_qrcode(self.set_ads_qr_path[1])
-        #     image = self.canvas.create_image(111, 0, anchor='nw', image=self.qr_2)
-        #
-        #     self.qr_3 = self._resize_ads_qrcode(self.set_ads_qr_path[2])
-        #     image = self.canvas.create_image(214, 0, anchor='nw', image=self.qr_3)
-        #
-        #     self.qr_4 = self._resize_ads_qrcode(self.set_ads_qr_path[3])
-        #     image = self.canvas.create_image(7, 100, anchor='nw', image=self.qr_4)
-        #
-        #     self.qr_5 = self._resize_ads_qrcode(self.set_ads_qr_path[4])
-        #     image = self.canvas.create_image(111, 100, anchor='nw', image=self.qr_5)
-        #
-        #     self.qr_6 = self._resize_ads_qrcode(self.set_ads_qr_path[5])
-        #     image = self.canvas.create_image(214, 100, anchor='nw', image=self.qr_6)
+        # 底部轮播栏 - 文字介绍
+        # l = tk.Label(self.ads,
+        #              text='优质技术公众号推荐',  # 标签的文字
+        #              bg='white',  # 背景颜色
+        #              fg='red',
+        #              font=('Arial', 12),  # 字体和字体大小
+        #              width=15, height=1  # 标签长宽
+        #              )
+        # l.pack(side='bottom')  # 固定窗口位置
 
-        self.canvas.pack(side='bottom')
-
-        l = tk.Label(self.ads,
-                     text='优质技术公众号推荐',  # 标签的文字
-                     bg='white',  # 背景颜色
-                     fg='red',
-                     font=('Arial', 12),  # 字体和字体大小
-                     width=15, height=1  # 标签长宽
-                     )
-        l.pack(side='bottom')  # 固定窗口位置
-
-        self.ads_animation()
-
-        # import threading
-        # thread = threading.Thread(target=self.test)
-        # thread.setDaemon(True)
-        # thread.start()
-        #self.test()
+        # 底部轮播栏 - 图片填充
+        # self.ads_animation()
 
     def show_alipay_hongbao(self):
         hongbao_window = tk.Toplevel()
@@ -548,20 +581,20 @@ class Main(tk.Frame):
         hongbao_window.geometry('{w}x{h}+{x}+{y}'.format(w=hww, h=hwh, x=hongbao_x, y=window.winfo_y()))
         hongbao_window.mainloop()
 
-    # def test(self):
-    #     import matplotlib.pyplot as plt
-    #     import matplotlib
-    #     plt.bar(range(3), [1, 2, 3], align='center', color='white', alpha=0.8)
-
     def ads_animation(self):
-        if self.ads_index % 2 == 0:
-            self.ads_1 = self._resize_ads_qrcode(PUBLIC_QR_1, size=(318, 214))
-            image = self.canvas.create_image(0, 0, anchor='nw', image=self.ads_1)
-        elif self.ads_index % 2 == 1:
-            self.ads_2 = self._resize_ads_qrcode(PUBLIC_QR_2, size=(318, 214))
-            image = self.canvas.create_image(0, 0, anchor='nw', image=self.ads_2)
-        self.ads_index = (self.ads_index + 1) % 2
-        self.master.after(10000, self.ads_animation)
+        # 轮播效果
+        # if self.ads_index % 2 == 0:
+        #     self.ads_1 = self._resize_ads_qrcode(PUBLIC_QR_1, size=(318, 214))
+        #     image = self.canvas.create_image(0, 0, anchor='nw', image=self.ads_1)
+        # elif self.ads_index % 2 == 1:
+        #     self.ads_2 = self._resize_ads_qrcode(PUBLIC_QR_2, size=(318, 214))
+        #     image = self.canvas.create_image(0, 0, anchor='nw', image=self.ads_2)
+        # self.ads_index = (self.ads_index + 1) % 2
+        # self.master.after(10000, self.ads_animation)
+        # 单图展示
+        #self.ads_1 = self._resize_ads_qrcode(PUBLIC_QR_1, size=(318, 214))
+        # image = self.canvas.create_image(0, 0, anchor='nw', image=self.ads_1)
+        pass
 
     def _resize_ads_qrcode(self, path, size=(100,100)):
         image_qr = Image.open(path)
@@ -611,11 +644,11 @@ if __name__ == "__main__":
     y = (window.winfo_screenheight() - height) / 2
     window.geometry('{w}x{h}+{x}+{y}'.format(w=width, h=height, x=x, y=y))
 
-    # main = Main(window, width=width, height=500, bg='white')
-    # main.pack(fill=tk.BOTH, expand=1)
-    # main.set_header('1.jpg')
-    # main.draw()
-    # main.update_progress(56)
+    main = Main(window, width=width, height=500, bg='white')
+    main.pack(fill=tk.BOTH, expand=1)
+    main.set_header('pure_code_w_214.png')
+    main.draw()
+    main.update_progress(56)
 
     # timer = threading.Timer(1, main.set_progress, args=(100,))
     # timer.start()
@@ -631,7 +664,7 @@ if __name__ == "__main__":
     # timer = threading.Timer(1, qrscan.update_qrcode)
     # timer.start()
 
-    ui = UI(window, width=width, height=height, bg='white')
-    ui.start()
+    # ui = UI(window, width=width, height=height, bg='white')
+    # ui.start()
 
     window.mainloop()
