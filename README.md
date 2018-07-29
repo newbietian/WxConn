@@ -8,12 +8,21 @@
 WxConn 是一个基于 python 2.7、python GUI Tkinter、微信网页版和 itchat 的 PC 端玩具。</br>
 下载Exe文件，无需安装依赖库，即可直接运行
 
-主要功能是：
+#### 主要功能
 * 进行个人微信中好友人数、群聊中人数的统计。
 * 生成关于所有可能连接人的「性别分析」、「前六省份分析」、「前五城市分析」。
 * 根据数据生成长图，并发送至手机端微信的「文件传输助手」。
 
-##### Release Note
+#### 安全
+* WxConn的所有网络活动均是与微信服务器进行。大佬可以抓包看看~
+* WxConn完全免费开源。
+* WxConn-v1.1的PC端Exe应用的MD5为：7cb7b684c920472391d8e0a64a0cbdbf
+
+#### 吐槽点
+* 由于基于微信网页版，未保存到通讯录中的群聊可能无法统计到。
+* 最近支付宝红包活动，搞了个侧边小按钮，点击弹出二维码来撸羊毛（离线图片）。
+
+#### Release Note
 ###### 2018-07-29
 [WxConn v1.1](https://github.com/Bravest-Ptt/WxConn/blob/master/release/WxConn-v1.1.exe)</br>
 MD5:7cb7b684c920472391d8e0a64a0cbdbf
