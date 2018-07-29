@@ -16,7 +16,7 @@ WxConn 是一个基于 python 2.7、python GUI Tkinter、微信网页版和 itch
 #### 安全
 * WxConn的所有网络活动均是与微信服务器进行。大佬可以抓包看看~
 * WxConn完全免费开源。
-* WxConn-v1.1的PC端Exe应用的MD5为：7cb7b684c920472391d8e0a64a0cbdbf
+* WxConn-v1.1（卡100%的bug已修复）的PC端Exe应用的MD5为：ba96dfa9bfb92f242b9887f499a52e74
 
 #### 吐槽点
 * 由于基于微信网页版，未保存到通讯录中的群聊可能无法统计到。
@@ -25,7 +25,7 @@ WxConn 是一个基于 python 2.7、python GUI Tkinter、微信网页版和 itch
 #### Release Note
 ###### 2018-07-29
 [WxConn v1.1](https://github.com/Bravest-Ptt/WxConn/blob/master/release/WxConn-v1.1.exe)</br>
-MD5:7cb7b684c920472391d8e0a64a0cbdbf
+MD5:ba96dfa9bfb92f242b9887f499a52e74
 
 ###### 2018-07-02
 [WxConn v1.0](https://github.com/Bravest-Ptt/WxConn/raw/master/release/WxConn-v1.0.exe)</br>
