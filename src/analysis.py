@@ -513,7 +513,24 @@ def analysis(com_queue=None):
         if not c:
             continue
         # 转为拼音
-        cities.append("".join(lazy_pinyin(c)).title())
+
+        # 优化城市字符显示
+        name_formatted = lazy_pinyin(c)
+        name_formatted[0] = name_formatted[0].title()
+        name_final = ''
+        MAX_NAME_LENGTH = 8
+        for index, word in enumerate(name_formatted):
+            if '\n' in name_final:
+                last_newline = name_final.rindex('\n')
+                str_temp = name_final[last_newline + 1:]
+            else:
+                str_temp = name_final
+            str_temp += word
+            if len(str_temp) > MAX_NAME_LENGTH:
+                word = '\n' + word
+            name_final += word
+
+        cities.append(name_final)
         city_people.append(city_df[c])
 
     # todo 注意由于plt在子线程中使用会出现问题，此处将plt生成图片部分转到主线程中执行。

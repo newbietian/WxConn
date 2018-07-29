@@ -172,6 +172,7 @@ class UI(object):
                 elif msg['mode'] == WHAT_DONE:
                     self.main.done()
                 elif msg['mode'] == WHAT_ANALYSIS_DATA:
+                    self.main.update_generating()
                     self.generate_sex_pic(msg['sex_data'])
                     self.generate_city_pic(msg['city_data'])
                     self.generate_province_pic(msg['provinces_data'])
@@ -236,7 +237,7 @@ class UI(object):
 
         # 为每个条形图添加数值标签
         for x, y in enumerate(sex_data):
-            plt.text(x, y + 5, y, ha='center')
+            plt.text(x, y + len(str(y)), y, ha='center')
 
         # 保存图片
         plt.savefig(ALS.result_path + '/2.png')
@@ -303,7 +304,7 @@ class UI(object):
 
         # 为每个条形图添加数值标签
         for x, y in enumerate(city_people):
-            plt.text(y + 5, x, y, ha='center')
+            plt.text(y + len(str(y)), x, y, ha='center')
 
         # 显示图形
         plt.savefig(ALS.result_path + '/4.png')
@@ -507,7 +508,7 @@ class Main(tk.Frame):
         self.lable_progress = tk.Label(self,
                      text='正在统计连接数...0%',  # 标签的文字
                      bg=self.bgcolor,  # 背景颜色
-                     font=('Arial', 12),  # 字体和字体大小
+                     font=('楷体', 12),  # 字体和字体大小
                      width=15, height=2  # 标签长宽
                      )
         self.lable_progress.pack(fill=tk.X)  # 固定窗口位置
@@ -516,7 +517,7 @@ class Main(tk.Frame):
         # Button
         # 支付宝红包活动于2018年7月31截止
         if datetime.datetime.now().year == 2018 and datetime.datetime.now().month < 8:
-            btn_enter = tk.Button(self, text='支\n付\n宝\n大\n红\n包',bg='#db2d32',fg='white',font=('Times',11),
+            btn_enter = tk.Button(self, text='支\n付\n宝\n大\n红\n包',bg='#db2d32',fg='white',font=('楷体',11),
                                   width=2, height=6,
                                   highlightthickness=0,relief='ridge',bd=0, command=self.show_alipay_hongbao)  # 定义一个`button`按钮，名为`Login`,触发命令为`usr_login`
             btn_enter.place(x=300, y=20, anchor=tk.NW)
@@ -614,6 +615,11 @@ class Main(tk.Frame):
         self.progress.config(value=value)
         self.progress.update()
 
+    def update_generating(self):
+        text = '生成结果中，请稍后'
+        self.lable_progress.config(text=text)
+        self.lable_progress.update()
+
     def done(self):
         text = '统计成功\n请在微信"文件传输助手"查看'
         self.lable_progress.config(text=text)
@@ -644,11 +650,11 @@ if __name__ == "__main__":
     y = (window.winfo_screenheight() - height) / 2
     window.geometry('{w}x{h}+{x}+{y}'.format(w=width, h=height, x=x, y=y))
 
-    main = Main(window, width=width, height=500, bg='white')
-    main.pack(fill=tk.BOTH, expand=1)
-    main.set_header('pure_code_w_214.png')
-    main.draw()
-    main.update_progress(56)
+    # main = Main(window, width=width, height=500, bg='white')
+    # main.pack(fill=tk.BOTH, expand=1)
+    # main.set_header('pure_code_w_214.png')
+    # main.draw()
+    # main.update_progress(56)
 
     # timer = threading.Timer(1, main.set_progress, args=(100,))
     # timer.start()
@@ -664,7 +670,7 @@ if __name__ == "__main__":
     # timer = threading.Timer(1, qrscan.update_qrcode)
     # timer.start()
 
-    # ui = UI(window, width=width, height=height, bg='white')
-    # ui.start()
+    ui = UI(window, width=width, height=height, bg='white')
+    ui.start()
 
     window.mainloop()
