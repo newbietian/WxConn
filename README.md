@@ -23,13 +23,18 @@ WxConn 是一个基于 python 2.7、python GUI Tkinter、微信网页版和 itch
 * 最近支付宝红包活动，搞了个侧边小按钮，点击弹出二维码来撸羊毛（离线图片）。
 
 #### Release Note
+
+###### 2018-08-01
+[WxConn v1.1 支付宝红包版](https://github.com/Bravest-Ptt/WxConn/raw/master/release/WxConn-v1.1-%E6%94%AF%E4%BB%98%E5%AE%9D%E7%BA%A2%E5%8C%85%E7%89%88.exe)</br>
+MD5: c2373dfd915a026eb52dd5ea703dedcd
+
 ###### 2018-07-29
 [WxConn v1.1](https://github.com/Bravest-Ptt/WxConn/raw/master/release/WxConn-v1.1.exe)</br>
-MD5:ba96dfa9bfb92f242b9887f499a52e74
+MD5: ba96dfa9bfb92f242b9887f499a52e74
 
 ###### 2018-07-02
 [WxConn v1.0](https://github.com/Bravest-Ptt/WxConn/raw/master/release/WxConn-v1.0.exe)</br>
-MD5:76942a54e5ec1ee68e2c56b7e7eabb42
+MD5: 76942a54e5ec1ee68e2c56b7e7eabb42
 
 #### 结果展示
 ![](https://github.com/Bravest-Ptt/WxConn/blob/master/result/result_little.jpg?raw=true)
