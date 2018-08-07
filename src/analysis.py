@@ -6,13 +6,13 @@ import base64
 import shutil
 import threading
 import sys
-import images
-
-import itchat
 from pypinyin import lazy_pinyin
 
 # [linux] sudo apt-get install python-pandas
 import pandas as pd
+
+import images
+import itchat
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -463,7 +463,6 @@ def analysis(com_queue=None):
     # 绘制数据
     # 初始化表格元组数据
     data_json = json.dumps(all_friend_list, cls=FriendEncoder)
-    print '1'
     df = pd.read_json(data_json, orient="records")
 
     # 获取性别数据
@@ -540,7 +539,6 @@ def analysis(com_queue=None):
                        "provinces_data": {"provinces_people": provinces_people, "provinces": provinces, "provinces_explode": provinces_explode},
                        "city_data": {"cities": cities, "city_people": city_people}
                        })
-    print threading.currentThread()
 
 
 def generate_result(com_queue=None):
@@ -580,8 +578,3 @@ def generate_result(com_queue=None):
     print u"已生成！请在手机端的「文件传输助手」查看结果，记得分享和关注猿湿Xoong喔！"
     print u"已生成！请在手机端的「文件传输助手」查看结果，记得分享和关注猿湿Xoong喔！"
     print u"已生成！请在手机端的「文件传输助手」查看结果，记得分享和关注猿湿Xoong喔！"
-
-    print threading.currentThread()
-
-    # while True:
-    #     time.sleep(10)

@@ -1,38 +1,48 @@
 # coding=utf8
-import tkinter as tk
-from tkinter import ttk
-import tkinter.font as tkFont
-import tkinter.messagebox as tkMessageBox
+import Tkinter as tk
+import ttk
+import tkFont
+import tkMessageBox
+
 from PIL import Image, ImageTk
-from emoji import *
-import analysis as ALS
 import base64
 import os
 import shutil
-import images
 import Queue
 import threading
 import random
 import sys
 import webbrowser
-import datetime
 
 # [linux] sudo apt-get install python-numpy python-matplotlib
 import matplotlib
+
+# For fix os-x issue: http://stackoverflow.com/a/34109240/965686
+# unrecognized selector sent to instance
+from matplotlib import use as matplotlib_use
+from sys import platform as sys_pf
+if sys_pf == 'darwin':
+    matplotlib_use("TkAgg")
+
 import matplotlib.pyplot as plt
 
+# personal
+from emoji import *
+import analysis as ALS
+import images
+
 # 路径常量定义
-VERSION = "v1.1"
+VERSION = "v1.2"
 DATA = "./WxConnData"
 RESOURCE = DATA + "/resource"
 RES_APP_TITLE = RESOURCE + "/app_title.png"
 RES_APP_ICON = RESOURCE + "/app_icon.ico"
-RES_MAIN_SHARE_TIP = "/main_share_tip.png"
+RES_MAIN_SHARE_TIP = RESOURCE + "/main_share_tip.png"
 
 PUBLIC_QR = DATA + "/qrcodes"
 PUBLIC_QR_HONGBAO = PUBLIC_QR + "/alipay_hongbao.png"
-PUBLIC_QR_PTT_CODE_WITH_TITLE = "/ptt_code_with_title.png"
-PUBLIC_QR_PTT_PURE_CODE = "/ptt_pure_code_.png"
+PUBLIC_QR_PTT_CODE_WITH_TITLE = PUBLIC_QR + "/ptt_code_with_title.png"
+PUBLIC_QR_PTT_PURE_CODE = PUBLIC_QR + "/ptt_pure_code.png"
 # 轮播滚动栏的图
 # PUBLIC_QR_1 = PUBLIC_QR + "/ads_1.png"
 # PUBLIC_QR_2 = PUBLIC_QR + "/ads_2.png"
@@ -68,9 +78,10 @@ def _init_resource():
         f1.write(base64.b64decode(images.res_app_title))
         f1.close()
 
-    with open(RES_APP_ICON, 'wb') as f2:
-        f2.write(base64.b64decode(images.res_app_icon))
-        f2.close()
+    if sys_pf == 'win32':
+        with open(RES_APP_ICON, 'wb') as f2:
+            f2.write(base64.b64decode(images.res_app_icon))
+            f2.close()
 
     with open(RES_MAIN_SHARE_TIP, 'wb') as f3:
         f3.write(base64.b64decode(images.main_share_tip))
@@ -336,14 +347,18 @@ class Introduction(tk.Frame):
         self.my_code.place(x=60, y=110)
 
         # Button
+        btn_ft = tkFont.Font(family='楷体', size=14, weight=tkFont.NORMAL)
         button_text = HAPPY_EMOJI[random.randint(0, len(HAPPY_EMOJI) - 1)]
-        self.btn_enter = tk.Button(self.base_frm, text=button_text, bg='white', fg='#25BF2F', font=('Arial', 14),
+        self.btn_enter = tk.Button(self.base_frm, text=button_text, bg='white', fg='#25BF2F', font=btn_ft,
                               width=12, height=1,
-                              bd=0.5, highlightthickness=0, relief='ridge', command=self._info_license)  # 定义一个`button`按钮，名为`Login`,触发命令为`usr_login`
-        self.btn_enter.place(x=90, y=430)
+                              bd=0.5, highlightthickness=0, relief='ridge', command=self._info_license)
+        if sys_pf == 'darwin':
+            self.btn_enter.place(x=105, y=430)
+        else:
+            self.btn_enter.place(x=95, y=430)
 
         # star on github
-        ft = tkFont.Font(family='Arial', size=10, weight=tkFont.NORMAL, underline=1)
+        ft = tkFont.Font(family='楷体', size=11, weight=tkFont.NORMAL, underline=1)
         self.github_site = tk.Label(self.base_frm,
                     text='Star on Github',  # 标签的文字
                     bg=self.bgcolor,  # 背景颜色
@@ -366,7 +381,7 @@ class Introduction(tk.Frame):
         self.thanks_wx.place(x=36, y=360)  # 固定窗口位置
 
         # itchat声明
-        ft_itchat = tkFont.Font(family='Arial', size=10, weight=tkFont.NORMAL)
+        ft_itchat = tkFont.Font(family='楷体', size=11, weight=tkFont.NORMAL)
         self.thanks_itchat = tk.Label(self.base_frm,
                     text='Based on github itchat',  # 标签的文字
                     bg=self.bgcolor,  # 背景颜色
@@ -376,8 +391,9 @@ class Introduction(tk.Frame):
             )
         self.thanks_itchat.place(x=36, y=380)  # 固定窗口位置
 
-        self.timer = threading.Timer(1, self._anim_button_emoji)
-        self.timer.start()
+        # 动态改变emoji
+        self._anim_button_emoji()
+
         self._info_save_group()
 
     def _info_save_group(self):
@@ -404,8 +420,7 @@ class Introduction(tk.Frame):
             button_text = HAPPY_EMOJI[random.randint(0, len(HAPPY_EMOJI) - 1)]
             self.btn_enter.config(text=button_text)
             self.btn_enter.update()
-            self.timer = threading.Timer(2, self._anim_button_emoji)
-            self.timer.start()
+            self.master.after(1000, self._anim_button_emoji)
 
     def _open_github_repo(self, event):
         print '_open_github_repo'
@@ -481,20 +496,6 @@ class Main(tk.Frame):
         self.ads_index = 0
 
     def draw(self):
-        # 进度条
-        # frm_progress=tk.Frame(window, bg='white')
-        # frm_progress.pack(side='top')
-        # app = Progress(window, width=120, height=120, bg='White')
-        # progress_image = Image.open('progress.png')
-        # progress_image = progress_image.resize((120,120))
-        # pri
-        # mycanvas = tk.Canvas(window, width=120, height=120, bg='White')
-        # #tkimage=tk.PhotoImage(file='xoong-100.gif')
-        # tkimage = ImageTk.PhotoImage(image=progress_image.rotate(10))
-        # mycanvas.create_image(0, 0, anchor='nw', image=tkimage)
-        # mycanvas.config()
-        # mycanvas.pack()
-
         # 头像
         header_size = 60
         self.header_canvas = tk.Canvas(self, bg=self.bgcolor, height=header_size, width=header_size, bd=0, highlightthickness=0, relief='ridge')
@@ -513,14 +514,10 @@ class Main(tk.Frame):
                      )
         self.lable_progress.pack(fill=tk.X)  # 固定窗口位置
 
-
-        # Button
-        # 支付宝红包活动于2018年7月31截止
-        if datetime.datetime.now().year == 2018 and datetime.datetime.now().month < 8:
-            btn_enter = tk.Button(self, text='支\n付\n宝\n大\n红\n包',bg='#db2d32',fg='white',font=('楷体',11),
-                                  width=2, height=6,
-                                  highlightthickness=0,relief='ridge',bd=0, command=self.show_alipay_hongbao)  # 定义一个`button`按钮，名为`Login`,触发命令为`usr_login`
-            btn_enter.place(x=300, y=20, anchor=tk.NW)
+        btn_enter = tk.Button(self, text='支\n付\n宝\n大\n红\n包',bg='#db2d32',fg='white',font=('楷体',11),
+                              width=2, height=6,
+                              highlightthickness=0,relief='ridge',bd=0, command=self.show_alipay_hongbao)
+        btn_enter.place(x=300, y=20, anchor=tk.NW)
 
         # 进度条
         self.progress = ttk.Progressbar(self, orient='horizontal', length=200, mode='determinate')
@@ -639,7 +636,8 @@ if __name__ == "__main__":
     # 标题
     window.title('你的微信到底连接多少人'+ VERSION)
     # icon
-    window.wm_iconbitmap(default=RES_APP_ICON)
+    if sys_pf == 'win32':
+        window.wm_iconbitmap(default=RES_APP_ICON)
     # 背景颜色
     window.config(background="white")
 
