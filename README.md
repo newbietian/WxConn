@@ -24,6 +24,10 @@ WxConn 是一个基于 python 2.7、python GUI Tkinter、微信网页版和 itch
 
 #### Release Note
 
+###### 2018-08-22
+[WxConn V1.2](https://github.com/Bravest-Ptt/WxConn/raw/master/release/WxConn-v1.2.exe)</br>
+MD5: 42044950a5911972360dc4e35e007250
+
 ###### 2018-08-01
 [WxConn v1.1 支付宝红包版](https://github.com/Bravest-Ptt/WxConn/raw/master/release/WxConn-v1.1-%E6%94%AF%E4%BB%98%E5%AE%9D%E7%BA%A2%E5%8C%85%E7%89%88.exe)</br>
 MD5: c2373dfd915a026eb52dd5ea703dedcd
