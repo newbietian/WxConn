@@ -25,8 +25,8 @@ Windows下载Exe文件，无需安装依赖库，即可直接运行。Mac暂未�
 #### Release Note
 
 ###### 2018-09-17
-[WxConn V1.2-MacOS](https://pan.baidu.com/s/1NGub2QNX-Q5_lBJMhH4Cpg)
-密码: hia2
+[WxConn V1.2-MacOS](https://pan.baidu.com/s/1NGub2QNX-Q5_lBJMhH4Cpg)</br>
+密码: hia2</br>
 MD5: 3d2536879e953946ade5ec7941b3e54c
 
 ###### 2018-08-22
