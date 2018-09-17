@@ -24,8 +24,11 @@ Windows下载Exe文件，无需安装依赖库，即可直接运行。Mac暂未�
 
 #### Release Note
 
+###### 2018-09-17
+[WxCon]
+
 ###### 2018-08-22
-[WxConn V1.2](https://github.com/Bravest-Ptt/WxConn/raw/master/release/WxConn-v1.2.exe)</br>
+[WxConn V1.2-Windows](https://github.com/Bravest-Ptt/WxConn/raw/master/release/WxConn-v1.2.exe)</br>
 MD5: 42044950a5911972360dc4e35e007250
 
 ###### 2018-08-01
